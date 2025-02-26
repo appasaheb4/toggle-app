@@ -20,4 +20,4 @@ yarn android
 5.  Shopify/Restyle
 6.  MobX
 
-Android release build link: https://appho.st/d/DXJbDXP6
+Android release build link: https://appho.st/d/UN60xVTe
