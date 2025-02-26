@@ -8,9 +8,9 @@ import {
   View,
   Alert,
 } from 'react-native';
-import DeviceInfo from 'react-native-device-info';
 
 import {ToggleSwitch, FullScreenProgress} from './src/components';
+import {postDeviceDetails} from './src/services';
 
 type AppProps = PropsWithChildren<{
   toggle?: boolean;
@@ -47,26 +47,14 @@ function App(): React.JSX.Element {
     }
   };
 
-  const deviceDetailsService = (toggle: boolean) => {
+  const deviceDetailsService = async (toggle: boolean) => {
     try {
       if (toggle) {
         setLoading(true);
-        fetch('https://dummyjson.com/users/add', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            os: DeviceInfo.getSystemName(),
-            imei: DeviceInfo.getUniqueId(),
-            location: DeviceInfo.getAvailableLocationProviders(),
-            publicIp: DeviceInfo.getIpAddress(),
-            screenshotStatus: {get: true},
-          }),
-        })
-          .then(res => res.json())
-          .then(res => {
-            console.log(res);
-            setLoading(false);
-          });
+        await postDeviceDetails().then((res: any) => {
+          console.log(res);
+          setLoading(false);
+        });
       }
     } catch (e) {
       console.log(e);
