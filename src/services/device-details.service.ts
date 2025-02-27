@@ -2,7 +2,7 @@ import DeviceInfo from 'react-native-device-info';
 
 const baseUrl = 'https://dummyjson.com';
 const addUserUrl = baseUrl + '/users/add';
-export const postDeviceDetails = async () => {
+export const postDeviceDetails = async (path: string) => {
   try {
     const result = fetch(addUserUrl, {
       method: 'POST',
@@ -12,7 +12,7 @@ export const postDeviceDetails = async () => {
         imei: DeviceInfo.getUniqueId(),
         location: DeviceInfo.getAvailableLocationProviders(),
         publicIp: DeviceInfo.getIpAddress(),
-        screenshotStatus: {get: true},
+        screenshotPath: path,
       }),
     })
       .then(res => res.json())

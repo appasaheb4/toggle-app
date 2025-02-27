@@ -11,18 +11,14 @@ import {
 } from 'react-native';
 
 import {ToggleSwitch, FullScreenProgress} from './src/components';
-import {postDeviceDetails} from './src/services';
-import startListening from './src/hooks/ScreenshotDetector';
+import startListening from './src/helper/ScreenshotDetector';
+import Singleton from './src/helper/Singleton';
 
 type AppProps = PropsWithChildren<{
   toggle?: boolean;
 }>;
 
 function App(): React.JSX.Element {
-  const {ScreenshotDetectorModule} = NativeModules;
-  const screenshotEventEmitter = new NativeEventEmitter(
-    ScreenshotDetectorModule,
-  );
   const isDarkMode = useColorScheme() === 'dark';
   const [loading, setLoading] = useState<boolean>(false);
   const [inputs, setInputs] = useState<AppProps>({
@@ -46,26 +42,6 @@ function App(): React.JSX.Element {
     try {
       const result = await NativeModules.ScreenshotModule.allow();
       console.log(result);
-      // we consider that the user has taken a screenshot after 4 seconds
-      // No here not detecting the screenshot, just a dummy call
-      // I will check later how to detect the screenshot in react native
-      setTimeout(() => {
-        deviceDetailsService(true);
-      }, 4000);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const deviceDetailsService = async (toggle: boolean) => {
-    try {
-      if (toggle) {
-        setLoading(true);
-        await postDeviceDetails().then((res: any) => {
-          console.log(res);
-          setLoading(false);
-        });
-      }
     } catch (e) {
       console.log(e);
     }
@@ -94,7 +70,7 @@ function App(): React.JSX.Element {
           setInputs({...inputs, toggle: value});
         }}
       />
-      {loading && <FullScreenProgress />}
+      {Singleton?.getLoading() && <FullScreenProgress />}
     </View>
   );
 }

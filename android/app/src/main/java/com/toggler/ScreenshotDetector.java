@@ -1,9 +1,11 @@
 package com.toggler;
 
 import android.app.Activity;
-import android.app.Application;
+import android.os.Environment;
+import android.os.FileObserver;
 import android.view.View;
 import android.view.ViewTreeObserver;
+
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -11,9 +13,11 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
+import java.io.File;
+
 public class ScreenshotDetector extends ReactContextBaseJavaModule {
     private final ReactApplicationContext reactContext;
-    private boolean screenshotTaken = false;
+    private FileObserver screenshotObserver;
 
     public ScreenshotDetector(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -33,19 +37,33 @@ public class ScreenshotDetector extends ReactContextBaseJavaModule {
             rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
-                    boolean isScreenshot = detectScreenshot();
-                    if (isScreenshot) {
-                        WritableMap params = new WritableNativeMap();
-                        params.putString("event", "screenshotTaken");
-                        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("ScreenshotDetected", params);
-                    }
+                    startScreenshotObserver();
                 }
             });
         }
     }
 
-    private boolean detectScreenshot() {
-        // Your logic to detect screenshot
-        return screenshotTaken;
+    private void startScreenshotObserver() {
+        String screenshotsPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/Screenshots";
+        screenshotObserver = new FileObserver(screenshotsPath, FileObserver.CREATE) {
+            @Override
+            public void onEvent(int event, String path) {
+                if (event == FileObserver.CREATE && path != null) {
+                    WritableMap params = new WritableNativeMap();
+                    params.putString("event", "screenshotTaken");
+                    params.putString("path", path);
+                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("ScreenshotDetected", params);
+                }
+            }
+        };
+        screenshotObserver.startWatching();
+    }
+
+    @Override
+    public void onCatalystInstanceDestroy() {
+        super.onCatalystInstanceDestroy();
+        if (screenshotObserver != null) {
+            screenshotObserver.stopWatching();
+        }
     }
 }
