@@ -3,6 +3,7 @@ import type {PropsWithChildren} from 'react';
 import {
   Image,
   StatusBar,
+  NativeEventEmitter,
   NativeModules,
   useColorScheme,
   View,
@@ -11,17 +12,26 @@ import {
 
 import {ToggleSwitch, FullScreenProgress} from './src/components';
 import {postDeviceDetails} from './src/services';
+import startListening from './src/hooks/ScreenshotDetector';
 
 type AppProps = PropsWithChildren<{
   toggle?: boolean;
 }>;
 
 function App(): React.JSX.Element {
+  const {ScreenshotDetectorModule} = NativeModules;
+  const screenshotEventEmitter = new NativeEventEmitter(
+    ScreenshotDetectorModule,
+  );
   const isDarkMode = useColorScheme() === 'dark';
   const [loading, setLoading] = useState<boolean>(false);
   const [inputs, setInputs] = useState<AppProps>({
     toggle: false,
   });
+
+  useEffect(() => {
+    startListening();
+  }, []);
 
   const disableScreenshot = async () => {
     try {
