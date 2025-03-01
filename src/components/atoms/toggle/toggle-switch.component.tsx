@@ -8,11 +8,11 @@ interface ToggleSwitchProps {
   onToggle?: (value: boolean) => void;
 }
 
-export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
+export const ToggleSwitch = ({
   label,
   initialValue = false,
   onToggle,
-}) => {
+}: ToggleSwitchProps) => {
   const [isEnabled, setIsEnabled] = useState(initialValue);
 
   const toggleSwitch = () => {
