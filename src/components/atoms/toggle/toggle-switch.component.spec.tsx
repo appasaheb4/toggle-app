@@ -4,7 +4,7 @@ import {ToggleSwitch} from './toggle-switch.component';
 
 describe('ToggleSwitch', () => {
   it.skip('renders correctly with initial value', () => {
-    render(<ToggleSwitch label={''} />);
+    render(<ToggleSwitch label={'Test Label'} />);
     expect(screen.getByText('Test Label')).toBeTruthy();
     const toggleSwitch = screen.getByTestId('toggle-switch-container');
     expect(toggleSwitch.props.style).toEqual(

@@ -1,16 +1,15 @@
-import React, {useEffect, useState, useCallback} from 'react';
+import React, {useEffect, useState} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   Image,
   StatusBar,
-  NativeEventEmitter,
   NativeModules,
   useColorScheme,
   View,
-  Alert,
 } from 'react-native';
 
 import {ToggleSwitch, FullScreenProgress} from './src/components';
+
 import startListening from './src/helper/ScreenshotDetector';
 import Singleton from './src/helper/Singleton';
 
@@ -20,7 +19,6 @@ type AppProps = PropsWithChildren<{
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
-  const [loading, setLoading] = useState<boolean>(false);
   const [inputs, setInputs] = useState<AppProps>({
     toggle: false,
   });
